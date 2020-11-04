@@ -1,0 +1,25 @@
+[package]
+name = "catboat"
+version = "0.1.0"
+authors = ["Joxcat"]
+edition = "2018"
+
+[dependencies]
+select = "0.5"
+tokio = { version = "0.2", features = ["full"] }
+hyper = "0.13"
+hyper-tls = "0.4"
+anyhow = "1.0"
+thiserror = "1.0"
+
+#[dependencies.serenity]
+#default-features = false
+#features = [
+#    "builder",
+#    "cache",
+#    "client",
+#    "framework",
+#    "utils",
+#    "rustls_backend"
+#]
+#version = "0.9"
