@@ -1,7 +1,10 @@
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Error, Debug)]
 pub enum CatBoatError {
-	#[error("unknown bot error")]
+	#[error("Attribute not found in Select")]
+	SelectAttrNotFound,
+	#[error("Unknown bot error")]
 	Unknown,
 }
