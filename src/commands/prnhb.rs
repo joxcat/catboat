@@ -1,22 +1,35 @@
-use crate::StandardResult;
-use crate::error::CatBoatError;
-use hyper::{Body, Client, body, Request};
-use hyper::client::HttpConnector;
+use crate::{
+    StandardResult,
+    error::CatBoatError
+};
+use hyper::{
+    Body,
+    Client,
+    body,
+    Request,
+    client::HttpConnector
+};
 use hyper_tls::HttpsConnector;
-use select::document::Document;
-use select::predicate::{Attr, Class, Name};
+use select::{
+    document::Document,
+    predicate::{Attr, Class, Name}
+};
+
+#[allow(dead_code)]
+const URL_BASE: &str = "https://fr.pornhub.com";
 
 #[derive(Debug)]
-pub struct Video {
+struct Video {
     pub title: String,
     pub href: String,
     pub img: String
 }
 
-pub async fn search<'a>(client: &Client<HttpsConnector<HttpConnector>>, query: &str) -> StandardResult<Vec<Video>> {
+#[allow(dead_code)]
+async fn search<'a>(client: &Client<HttpsConnector<HttpConnector>>, query: &str) -> StandardResult<Vec<Video>> {
     let req = Request::builder()
         .method("GET")
-        .uri(["https://fr.pornhub.com/video/search?search=", query].concat())
+        .uri([URL_BASE, "/video/search?search=", query].concat())
         .header("Cookie", "platform=pc;accessAgeDisclaimerPH=1")
         .header("User-Agent", "CatBoat/1.0.0")
         .body(Body::empty())?;
@@ -38,10 +51,28 @@ pub async fn search<'a>(client: &Client<HttpsConnector<HttpConnector>>, query: &
     Ok(videos_selection.iter().map(|video| -> StandardResult<Video> {
         Ok(Video {
             title: video.attr("title").ok_or(CatBoatError::SelectAttrNotFound)?.to_owned(),
-            href: video.attr("href").ok_or(CatBoatError::SelectAttrNotFound)?.to_owned(),
+            href: [URL_BASE, &video.attr("href").ok_or(CatBoatError::SelectAttrNotFound)?.to_owned()].concat(),
             img: video.find(Name("img"))
                 .next().ok_or(CatBoatError::Unknown)?
                 .attr("data-thumb_url").ok_or(CatBoatError::SelectAttrNotFound)?.to_owned(),
         })
     }).collect::<StandardResult<Vec<Video>>>()?)
+}
+
+use serenity::prelude::*;
+use serenity::model::prelude::*;
+use serenity::framework::standard::{
+    CommandResult,
+    macros::command,
+};
+
+#[command]
+async fn search_p(ctx: &Context, msg: &Message) -> CommandResult {
+    let videos = search(&crate::HTTPS_CLIENT, "test").await.expect("Error while searching");
+
+    for vid in videos {
+        msg.channel_id.say(&ctx.http, format!("Title: {}\nURL: {}", vid.title, vid.href)).await?;
+    }
+
+    Ok(())
 }

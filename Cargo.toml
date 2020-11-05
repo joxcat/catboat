@@ -5,21 +5,34 @@ authors = ["Joxcat"]
 edition = "2018"
 
 [dependencies]
-select = "0.5"
+# Async IO
 tokio = { version = "0.2", features = ["full"] }
+# Serenity
+dotenv = "0.15"
+# Logs
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2" # needed so intrument works with async functions.
+# Web scraping
+select = "0.5"
 hyper = "0.13"
 hyper-tls = "0.4"
+# Errors
+human-panic = "1.0"
 anyhow = "1.0"
 thiserror = "1.0"
 
-#[dependencies.serenity]
-#default-features = false
-#features = [
-#    "builder",
-#    "cache",
-#    "client",
-#    "framework",
-#    "utils",
-#    "rustls_backend"
-#]
-#version = "0.9"
+lazy_static = "1.4"
+
+[dependencies.serenity]
+default-features = true
+features = [
+    "builder",
+    "cache",
+    "client",
+    "framework",
+    "standard_framework",
+    "utils",
+    "rustls_backend"
+]
+version = "0.9"
