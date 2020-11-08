@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 # Async IO
-tokio = { version = "0.2", features = ["full"] }
+tokio = { version = "0.2", features = ["macros", "signal"], default-features = false }
 # Serenity
 dotenv = "0.15"
 # Logs
@@ -17,12 +17,10 @@ tracing-futures = "0.2" # needed so intrument works with async functions.
 select = "0.5"
 hyper = "0.13"
 hyper-tls = "0.4"
+urlencoding = "1.1"
 # Errors
 human-panic = "1.0"
-anyhow = "1.0"
 thiserror = "1.0"
-
-lazy_static = "1.4"
 
 [dependencies.serenity]
 default-features = true
