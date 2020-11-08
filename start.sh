@@ -7,4 +7,4 @@ if [[ ! -f "./target/release/catboat" ]]; then
   echo "Building"
   cargo build --release
 fi
-./target/release/catboat >> catboat.log 2>&1
+./target/release/catboat >> catboat.log 2>&1 &
