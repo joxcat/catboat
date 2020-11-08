@@ -43,7 +43,7 @@ struct Handler;
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
-        ctx.reset_presence();
+        ctx.reset_presence().await;
         ctx.set_activity(Activity::competing("être le meilleur boat !")).await;
     }
     async fn resume(&self, _: Context, _: ResumedEvent) {

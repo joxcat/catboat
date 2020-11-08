@@ -1,9 +1,9 @@
 #!/bin/bash
-if [[ -f "catboat.log" ]]; then; else
+if [[ ! -f "catboat.log" ]]; then
   echo "Cleaning up old log"
   mv catboat.log.old
 fi
-if [[ -d "./target/release/catboat" ]]; then; else
+if [[ ! -f "./target/release/catboat" ]]; then
   echo "Building"
   cargo build --release
 fi
