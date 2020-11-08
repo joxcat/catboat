@@ -2,3 +2,5 @@
 .idea/
 Cargo.lock
 .env
+catboat.log
+catboat.log.old

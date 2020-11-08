@@ -52,7 +52,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(phub, addme)]
+#[commands(phub, addme, source)]
 struct General;
 
 #[group]
