@@ -163,6 +163,8 @@ pub async fn phub(ctx: &Context, msg: &Message) -> CommandResult {
                     m
                 })
                 .await?;
+        } else {
+            msg.reply(&ctx.http, "désolé aucune vidéo ne correspond à ta recherche").await?;
         }
     }
 
