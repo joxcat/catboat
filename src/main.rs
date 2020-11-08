@@ -4,15 +4,21 @@ mod error;
 use crate::error::CatBoatError;
 use human_panic::setup_panic;
 use hyper_tls::HttpsConnector;
+
 use serenity::{
     async_trait,
     client::bridge::gateway::ShardManager,
-    framework::{standard::macros::group, StandardFramework},
+    framework::{standard::macros::{group, help}, StandardFramework},
     http::Http,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
+use serenity::framework::standard::{help_commands, CommandResult, CommandGroup, HelpOptions, Args};
+use serenity::model::prelude::{UserId, Message};
+use serenity::model::gateway::Activity;
+
 use std::{collections::HashSet, env, sync::Arc};
+
 use tracing::{error, info};
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
@@ -35,8 +41,10 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    async fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, ctx: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
+        ctx.reset_presence();
+        ctx.set_activity(Activity::competing("être le meilleur boat !")).await;
     }
     async fn resume(&self, _: Context, _: ResumedEvent) {
         info!("Resumed");
@@ -48,9 +56,26 @@ impl EventHandler for Handler {
 struct General;
 
 #[group]
+#[only_in(guilds)]
 #[owners_only]
 #[commands(quit)]
 struct Owner;
+
+#[help]
+#[lacking_permissions = "Hide"]
+#[lacking_role = "Nothing"]
+#[wrong_channel = "Strike"]
+async fn help(
+    context: &Context,
+    msg: &Message,
+    args: Args,
+    help_options: &'static HelpOptions,
+    groups: &[&'static CommandGroup],
+    owners: HashSet<UserId>
+) -> CommandResult {
+    help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() -> StandardResult<()> {
@@ -73,7 +98,7 @@ async fn main() -> StandardResult<()> {
     let http = Http::new_with_token(&token);
 
     // We will fetch your bot's owners and id
-    let (owners, _bot_id) = match http.get_current_application_info().await {
+    let (owners, bot_id) = match http.get_current_application_info().await {
         Ok(info) => {
             let mut owners = HashSet::new();
             owners.insert(info.owner.id);
@@ -83,16 +108,17 @@ async fn main() -> StandardResult<()> {
     };
 
     // Create the framework
-    let mut framework = StandardFramework::new().configure(|c| {
+    let framework = StandardFramework::new().configure(|c| {
         c.owners(owners)
+            .on_mention(Some(bot_id))
             .prefix(BOT_PREFIX)
             .case_insensitivity(true)
-            .allow_dm(false)
-    });
-
-    // Add the commands
-    framework.group_add(&OWNER_GROUP);
-    framework.group_add(&GENERAL_GROUP);
+            .allow_dm(true)
+            .no_dm_prefix(true)
+    })
+    .group(&OWNER_GROUP)
+    .group(&GENERAL_GROUP)
+    .help(&HELP);
 
     let mut client = Client::builder(&token)
         .framework(framework)

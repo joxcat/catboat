@@ -119,6 +119,8 @@ use serenity::utils::MessageBuilder;
 const COMMAND: &str = "phub";
 
 #[command]
+// #[only_in(guilds)]
+#[usage("<votre recherche>")]
 pub async fn phub(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read().await;
     let http_client = data
@@ -134,7 +136,7 @@ pub async fn phub(ctx: &Context, msg: &Message) -> CommandResult {
                 MessageBuilder::new()
                     .mention(&msg.author)
                     .push(" Merci d'utiliser la commande comme ceci : ")
-                    .push_mono([BOT_PREFIX, COMMAND, " votre recherche"].concat())
+                    .push_mono([BOT_PREFIX, COMMAND, " <votre recherche>"].concat())
                     .build(),
             )
             .await?;
