@@ -143,7 +143,7 @@ pub async fn phub(ctx: &Context, msg: &Message) -> CommandResult {
     } else {
         msg_content.remove(0);
         let query = msg_content.join(" ");
-        warn!("{}", query);
+        warn!("{} => {}", msg.author.name, query);
 
         if let Some(vid) = search(http_client, &query)
             .await
