@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ ! -f "catboat.log" ]]; then
   echo "Cleaning up old log"
-  mv catboat.log.old
+  mv catboat.log catboat.log.old
 fi
 if [[ ! -f "./target/release/catboat" ]]; then
   echo "Building"
